@@ -18,12 +18,13 @@ layers, namely through the following ones:
 
 ### Payment Settlement
 Once per some time interval, a merchant run settlement operation, which sends all the gathered
-authorized transactions and send them for settlement at merchant's bank account.
+authorized transactions to acquiring bank to settle the funds in merchant's bank account .
 
 ![payment-settlement.png](docs/payment-settlement.png)
 
 ### Payment Gateway
-Payment gateway is a bridge between point-of-sale (POS) and payment processors. Some systems
+Payment gateway is a bridge between point-of-sale (POS) and payment processors. Usually,
+payment gateway are used for online sales, not physical POS hardware. Some systems
 might serve as payment gateway and processor the same time. But let's separate these two
 concepts for clarity.
 
