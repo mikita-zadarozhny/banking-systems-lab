@@ -4,7 +4,7 @@ import org.mikita.bankingsystemslab.transaction.domain.Transaction
 import org.mikita.bankingsystemslab.transaction.repository.TransactionRepository
 import org.mikita.bankingsystemslab.transaction.service.command.AppendToLedgerCommand
 import org.mikita.bankingsystemslab.transaction.service.command.CreateTransactionCommand
-import org.mikita.bankingsystemslab.transaction.service.command.UpdateBalanceCommand
+import org.mikita.bankingsystemslab.transaction.service.command.UpdateAccountBalanceCommand
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
@@ -28,12 +28,12 @@ class TransactionService (
 
         transactionRepository.save(transaction)
 
-        accountService.updateBalance(UpdateBalanceCommand(
+        accountService.updateAccountBalance(UpdateAccountBalanceCommand(
             createTransactionCommand.sender,
             -createTransactionCommand.money
         ))
 
-        accountService.updateBalance(UpdateBalanceCommand(
+        accountService.updateAccountBalance(UpdateAccountBalanceCommand(
             createTransactionCommand.recipient,
             createTransactionCommand.money
         ))

@@ -10,7 +10,7 @@ import org.mikita.bankingsystemslab.transaction.domain.Account
 import org.mikita.bankingsystemslab.transaction.domain.Currency
 import org.mikita.bankingsystemslab.transaction.domain.Money
 import org.mikita.bankingsystemslab.transaction.repository.AccountRepository
-import org.mikita.bankingsystemslab.transaction.service.command.UpdateBalanceCommand
+import org.mikita.bankingsystemslab.transaction.service.command.UpdateAccountBalanceCommand
 import java.math.BigDecimal
 import java.util.Optional
 
@@ -28,10 +28,10 @@ class AccountServiceTest {
     }
 
     @Test
-    fun updateBalance() {
+    fun updateAccountBalance() {
 
         // given
-        val updateBalanceCommand = UpdateBalanceCommand(
+        val updateAccountBalanceCommand = UpdateAccountBalanceCommand(
             10000,
             Money(
                 Currency.USD,
@@ -51,7 +51,7 @@ class AccountServiceTest {
         )
 
         // when
-        accountService.updateBalance(updateBalanceCommand)
+        accountService.updateAccountBalance(updateAccountBalanceCommand)
 
         // then
         verify {

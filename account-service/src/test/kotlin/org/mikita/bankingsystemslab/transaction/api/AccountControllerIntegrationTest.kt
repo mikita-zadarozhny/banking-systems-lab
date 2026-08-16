@@ -1,9 +1,11 @@
 package org.mikita.bankingsystemslab.transaction.api
 
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertNotNull
 import org.mikita.bankingsystemslab.transaction.api.dto.CreateAccountRequestDto
-import org.mikita.bankingsystemslab.transaction.api.dto.CreateAccountResponseDto
+import org.mikita.bankingsystemslab.transaction.api.dto.AccountResponseDto
 import org.mikita.bankingsystemslab.transaction.domain.Currency
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
@@ -15,11 +17,12 @@ import org.springframework.test.web.servlet.client.expectBody
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.postgresql.PostgreSQLContainer
+import java.math.BigDecimal
 
 @Testcontainers
 @ActiveProfiles("integration-tests")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class AccountServiceIntegrationTest {
+class AccountControllerIntegrationTest {
 
     @LocalServerPort
     private var port: Int = 0
@@ -45,13 +48,23 @@ class AccountServiceIntegrationTest {
     }
 
     @Test
-    fun shouldCreateAccount() {
-        restTestClient.post().uri("/api/v1/accounts").body(
-            CreateAccountRequestDto(
-                currency = Currency.USD
-            )
-        ).exchange()
+    fun shouldCreateAndGetAccount() {
+        val createdAccount = restTestClient.post()
+            .uri("/api/v1/accounts")
+            .body(CreateAccountRequestDto(Currency.USD))
+            .exchange()
             .expectStatus().isCreated()
-            .expectBody<CreateAccountResponseDto>()
+            .expectBody<AccountResponseDto>()
+            .returnResult().responseBody
+
+        assertNotNull(createdAccount)
+        assertEquals(Currency.USD, createdAccount.balance.currency)
+        assertEquals(BigDecimal.ZERO, createdAccount.balance.amount)
+
+        restTestClient.get().uri("/api/v1/accounts/{accountId}", createdAccount.accountId)
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody<AccountResponseDto>()
+            .isEqualTo(createdAccount)
     }
 }

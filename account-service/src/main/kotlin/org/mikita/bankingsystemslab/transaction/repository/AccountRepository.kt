@@ -3,6 +3,7 @@ package org.mikita.bankingsystemslab.transaction.repository
 import org.mikita.bankingsystemslab.transaction.domain.Account
 import org.mikita.bankingsystemslab.transaction.domain.Currency
 import org.mikita.bankingsystemslab.transaction.domain.Money
+import org.mikita.bankingsystemslab.transaction.exception.AccountDoesNotExistException
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.jdbc.core.JdbcTemplate
@@ -10,6 +11,7 @@ import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
+import java.math.BigDecimal
 import java.sql.Types
 import java.util.Optional
 
@@ -44,7 +46,12 @@ class AccountRepository (
     }
 
     @Transactional(propagation = Propagation.MANDATORY)
-    fun createAccount(currency: Currency): Long {
+    fun getById(id: Long): Account {
+        return findById(id).orElseThrow{ AccountDoesNotExistException(id) }
+    }
+
+    @Transactional(propagation = Propagation.MANDATORY)
+    fun saveNew(currency: Currency): Account {
         val insertQuery = "INSERT INTO accounts (account_id, currency, balance, version) " +
                 "VALUES (nextval('account_id_seq'), ?, 0, 0) RETURNING account_id"
 
@@ -55,7 +62,11 @@ class AccountRepository (
             Long::class.java
         )
 
-        return accountId!!
+        return Account(
+            accountId = accountId!!,
+            balance = Money(currency, BigDecimal.ZERO),
+            version = 0
+        )
     }
 
     @Transactional(propagation = Propagation.MANDATORY)

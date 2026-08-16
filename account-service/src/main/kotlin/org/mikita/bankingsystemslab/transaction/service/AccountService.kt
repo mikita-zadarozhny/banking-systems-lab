@@ -5,7 +5,7 @@ import org.mikita.bankingsystemslab.transaction.exception.AccountDoesNotExistExc
 import org.mikita.bankingsystemslab.transaction.exception.NegativeAccountBalanceException
 import org.mikita.bankingsystemslab.transaction.repository.AccountRepository
 import org.mikita.bankingsystemslab.transaction.service.command.CreateAccountCommand
-import org.mikita.bankingsystemslab.transaction.service.command.UpdateBalanceCommand
+import org.mikita.bankingsystemslab.transaction.service.command.UpdateAccountBalanceCommand
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -14,19 +14,19 @@ class AccountService (
     private val accountRepository: AccountRepository
 ){
     @Transactional
-    fun updateBalance(updateBalanceCommand: UpdateBalanceCommand) {
-        val optionalAccount  = accountRepository.findById(updateBalanceCommand.accountId)
+    fun updateAccountBalance(updateAccountBalanceCommand: UpdateAccountBalanceCommand) {
+        val optionalAccount  = accountRepository.findById(updateAccountBalanceCommand.accountId)
         if(optionalAccount.isEmpty) {
-            throw AccountDoesNotExistException(updateBalanceCommand.accountId)
+            throw AccountDoesNotExistException(updateAccountBalanceCommand.accountId)
         }
         val account = optionalAccount.get()
-        val updatedAccount = account.copy(balance = account.balance + updateBalanceCommand.delta)
+        val updatedAccount = account.copy(balance = account.balance + updateAccountBalanceCommand.delta)
 
         if(updatedAccount.balance < 0) {
             throw NegativeAccountBalanceException(
-                updateBalanceCommand.accountId,
+                updateAccountBalanceCommand.accountId,
                 account.balance.amount,
-                updateBalanceCommand.delta.amount
+                updateAccountBalanceCommand.delta.amount
             )
         }
 
@@ -34,7 +34,12 @@ class AccountService (
     }
 
     @Transactional
-    fun createAccount(createAccountCommand: CreateAccountCommand): Long {
-        return accountRepository.createAccount(createAccountCommand.currency)
+    fun createAccount(createAccountCommand: CreateAccountCommand): Account {
+        return accountRepository.saveNew(createAccountCommand.currency)
+    }
+
+    @Transactional
+    fun getAccount(accountId: Long): Account {
+        return accountRepository.getById(accountId)
     }
 }
