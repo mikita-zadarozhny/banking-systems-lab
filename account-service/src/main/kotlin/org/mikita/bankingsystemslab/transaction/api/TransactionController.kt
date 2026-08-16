@@ -5,7 +5,7 @@ import org.mikita.bankingsystemslab.transaction.api.dto.CreateTransactionRequest
 import org.mikita.bankingsystemslab.transaction.api.dto.CreateTransactionResponseDto
 import org.mikita.bankingsystemslab.transaction.exception.AccountDoesNotExistException
 import org.mikita.bankingsystemslab.transaction.exception.CurrencyMismatchException
-import org.mikita.bankingsystemslab.transaction.exception.NegativeAccountBalanceException
+import org.mikita.bankingsystemslab.transaction.exception.OverdraftNotSupportedException
 import org.mikita.bankingsystemslab.transaction.service.TransactionService
 import org.mikita.bankingsystemslab.transaction.service.command.CreateTransactionCommand
 import org.springframework.http.HttpStatus
@@ -35,10 +35,10 @@ class TransactionController (
         return ResponseEntity(CreateTransactionResponseDto(transactionId), HttpStatus.CREATED);
     }
 
-    @ExceptionHandler(NegativeAccountBalanceException::class)
-    fun handleNegativeAccountBalanceException(ex: NegativeAccountBalanceException): ResponseEntity<ApiErrorResponseDto> {
+    @ExceptionHandler(OverdraftNotSupportedException::class)
+    fun handleOverdraftNotSupportedException(ex: OverdraftNotSupportedException): ResponseEntity<ApiErrorResponseDto> {
         val error = ApiErrorResponseDto(
-            message = "Not sufficient funds."
+            message = "Overdraft is not supported."
         )
         return ResponseEntity(error, HttpStatus.BAD_REQUEST)
     }

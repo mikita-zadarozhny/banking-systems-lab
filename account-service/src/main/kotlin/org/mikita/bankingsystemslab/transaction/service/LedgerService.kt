@@ -13,17 +13,16 @@ class LedgerService (
     @Transactional
     fun appendToLedger(appendToLedgerCommand: AppendToLedgerCommand) {
 
-        val senderDelta = -appendToLedgerCommand.money
         val senderLedgerEntry = LedgerEntry(
             appendToLedgerCommand.transactionId,
             appendToLedgerCommand.sender,
-            senderDelta
+            appendToLedgerCommand.money
         )
 
         val recipientLedgerEntry = LedgerEntry(
             appendToLedgerCommand.transactionId,
             appendToLedgerCommand.recipient,
-            appendToLedgerCommand.money
+            -appendToLedgerCommand.money
         )
 
         ledgerEntryRepository.saveAll(arrayOf(senderLedgerEntry, recipientLedgerEntry));

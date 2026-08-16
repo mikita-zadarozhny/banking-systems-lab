@@ -1,6 +1,7 @@
 package org.mikita.bankingsystemslab.transaction.repository
 
 import org.mikita.bankingsystemslab.transaction.domain.Account
+import org.mikita.bankingsystemslab.transaction.domain.AccountType
 import org.mikita.bankingsystemslab.transaction.domain.Currency
 import org.mikita.bankingsystemslab.transaction.domain.Money
 import org.mikita.bankingsystemslab.transaction.exception.AccountDoesNotExistException
@@ -25,12 +26,13 @@ class AccountRepository (
         val accountRowMapper = RowMapper { rs, _ ->
             Account(
                 accountId = rs.getLong(1),
-                balance = Money(Currency.valueOf(rs.getString(2)), rs.getBigDecimal(3)),
-                version = rs.getInt(4)
+                accountType = AccountType.ofCode(rs.getInt(2)),
+                balance = Money(Currency.ofCode(rs.getInt(3)), rs.getBigDecimal(4)),
+                version = rs.getInt(5)
             )
         }
 
-        val query = "SELECT account_id, currency, balance, version " +
+        val query = "SELECT account_id, account_type, currency, balance, version " +
                 "FROM accounts " +
                 "WHERE account_id = ?"
 
@@ -52,18 +54,25 @@ class AccountRepository (
 
     @Transactional(propagation = Propagation.MANDATORY)
     fun saveNew(currency: Currency): Account {
-        val insertQuery = "INSERT INTO accounts (account_id, currency, balance, version) " +
-                "VALUES (nextval('account_id_seq'), ?, 0, 0) RETURNING account_id"
+        val insertQuery = "INSERT INTO accounts (account_id, account_type, currency, balance, version) " +
+                "VALUES (nextval('account_id_seq'), ?, ?, 0, 0) RETURNING account_id"
 
         val accountId: Long? = jdbcTemplate.queryForObject(
             insertQuery,
-            arrayOf(currency.name),
-            intArrayOf(Types.CHAR),
+            arrayOf<Any?>(
+                AccountType.CUSTOMER_DEPOSIT.code,
+                currency.code
+            ),
+            intArrayOf(
+                Types.INTEGER,
+                Types.INTEGER
+            ),
             Long::class.java
         )
 
         return Account(
             accountId = accountId!!,
+            accountType = AccountType.CUSTOMER_DEPOSIT,
             balance = Money(currency, BigDecimal.ZERO),
             version = 0
         )

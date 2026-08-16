@@ -7,6 +7,7 @@ import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mikita.bankingsystemslab.transaction.domain.Account
+import org.mikita.bankingsystemslab.transaction.domain.AccountType
 import org.mikita.bankingsystemslab.transaction.domain.Currency
 import org.mikita.bankingsystemslab.transaction.domain.Money
 import org.mikita.bankingsystemslab.transaction.repository.AccountRepository
@@ -35,16 +36,17 @@ class AccountServiceTest {
             10000,
             Money(
                 Currency.USD,
-                BigDecimal.valueOf(100)
+                BigDecimal.valueOf(-200)
             )
         )
 
         every { accountRepository.findById(10000) } returns Optional.of(
             Account(
                 accountId = 10000,
+                accountType = AccountType.CUSTOMER_DEPOSIT,
                 balance = Money(
                     currency = Currency.USD,
-                    amount = BigDecimal.valueOf(200)
+                    amount = BigDecimal.valueOf(-100)
                 ),
                 version = 0
             )
@@ -59,9 +61,10 @@ class AccountServiceTest {
             accountRepository.updateBalanceOptimistically(
                 Account(
                     accountId = 10000,
+                    accountType = AccountType.CUSTOMER_DEPOSIT,
                     balance = Money(
                         currency = Currency.USD,
-                        amount = BigDecimal.valueOf(300)
+                        amount = BigDecimal.valueOf(-300)
                     ),
                     version = 0
                 )

@@ -19,12 +19,12 @@ class TransactionRepository (
             arrayOf<Any?>(
                 transaction.id,
                 transaction.idempotencyKey,
-                transaction.type.name
+                transaction.type.code
             ),
             intArrayOf(
                 Types.VARCHAR,
                 Types.VARCHAR,
-                Types.CHAR,
+                Types.INTEGER,
             )
         )
     }

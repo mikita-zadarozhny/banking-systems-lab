@@ -23,7 +23,7 @@ class LedgerEntryRepository (
                 val ledgerEntry: LedgerEntry = ledgerEntries[i]
                 ps.setString(1, ledgerEntry.transactionId)
                 ps.setLong(2, ledgerEntry.accountId)
-                ps.setString(3, ledgerEntry.money.currency.name)
+                ps.setInt(3, ledgerEntry.money.currency.code)
                 ps.setBigDecimal(4, ledgerEntry.money.amount)
             }
 

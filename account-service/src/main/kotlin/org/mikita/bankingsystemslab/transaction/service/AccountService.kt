@@ -1,8 +1,9 @@
 package org.mikita.bankingsystemslab.transaction.service
 
 import org.mikita.bankingsystemslab.transaction.domain.Account
+import org.mikita.bankingsystemslab.transaction.domain.AccountType
 import org.mikita.bankingsystemslab.transaction.exception.AccountDoesNotExistException
-import org.mikita.bankingsystemslab.transaction.exception.NegativeAccountBalanceException
+import org.mikita.bankingsystemslab.transaction.exception.OverdraftNotSupportedException
 import org.mikita.bankingsystemslab.transaction.repository.AccountRepository
 import org.mikita.bankingsystemslab.transaction.service.command.CreateAccountCommand
 import org.mikita.bankingsystemslab.transaction.service.command.UpdateAccountBalanceCommand
@@ -22,8 +23,8 @@ class AccountService (
         val account = optionalAccount.get()
         val updatedAccount = account.copy(balance = account.balance + updateAccountBalanceCommand.delta)
 
-        if(updatedAccount.balance < 0) {
-            throw NegativeAccountBalanceException(
+        if(account.accountType == AccountType.CUSTOMER_DEPOSIT && updatedAccount.balance > 0) {
+            throw OverdraftNotSupportedException(
                 updateAccountBalanceCommand.accountId,
                 account.balance.amount,
                 updateAccountBalanceCommand.delta.amount

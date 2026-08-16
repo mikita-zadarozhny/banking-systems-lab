@@ -30,12 +30,12 @@ class TransactionService (
 
         accountService.updateAccountBalance(UpdateAccountBalanceCommand(
             createTransactionCommand.sender,
-            -createTransactionCommand.money
+            createTransactionCommand.money
         ))
 
         accountService.updateAccountBalance(UpdateAccountBalanceCommand(
             createTransactionCommand.recipient,
-            createTransactionCommand.money
+            -createTransactionCommand.money
         ))
 
         ledgerService.appendToLedger(AppendToLedgerCommand(
