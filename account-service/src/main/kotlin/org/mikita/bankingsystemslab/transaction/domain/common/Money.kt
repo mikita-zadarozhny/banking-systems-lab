@@ -1,4 +1,4 @@
-package org.mikita.bankingsystemslab.transaction.domain
+package org.mikita.bankingsystemslab.transaction.domain.common
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import org.mikita.bankingsystemslab.transaction.exception.CurrencyMismatchException
@@ -16,6 +16,13 @@ data class Money @JsonCreator constructor (
             throw CurrencyMismatchException(currency, other.currency)
         }
         return Money(currency, amount.add(other.amount))
+    }
+
+    operator fun minus(other: Money): Money {
+        if(other.currency != currency) {
+            throw CurrencyMismatchException(currency, other.currency)
+        }
+        return Money(currency, amount.subtract(other.amount))
     }
 
     operator fun compareTo(other: Int): Int {

@@ -1,6 +1,6 @@
 package org.mikita.bankingsystemslab.transaction.repository
 
-import org.mikita.bankingsystemslab.transaction.domain.Transaction
+import org.mikita.bankingsystemslab.transaction.domain.transaction.Transaction
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Propagation
@@ -19,12 +19,12 @@ class TransactionRepository (
             arrayOf<Any?>(
                 transaction.id,
                 transaction.idempotencyKey,
-                transaction.type.code
+                transaction.type.name
             ),
             intArrayOf(
                 Types.VARCHAR,
                 Types.VARCHAR,
-                Types.INTEGER,
+                Types.VARCHAR,
             )
         )
     }

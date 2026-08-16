@@ -6,10 +6,11 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mikita.bankingsystemslab.transaction.domain.Account
-import org.mikita.bankingsystemslab.transaction.domain.AccountType
-import org.mikita.bankingsystemslab.transaction.domain.Currency
-import org.mikita.bankingsystemslab.transaction.domain.Money
+import org.mikita.bankingsystemslab.transaction.domain.account.Account
+import org.mikita.bankingsystemslab.transaction.domain.account.AccountType
+import org.mikita.bankingsystemslab.transaction.domain.account.AccountingType
+import org.mikita.bankingsystemslab.transaction.domain.common.Currency
+import org.mikita.bankingsystemslab.transaction.domain.common.Money
 import org.mikita.bankingsystemslab.transaction.repository.AccountRepository
 import org.mikita.bankingsystemslab.transaction.service.command.UpdateAccountBalanceCommand
 import java.math.BigDecimal
@@ -44,6 +45,7 @@ class AccountServiceTest {
             Account(
                 accountId = 10000,
                 accountType = AccountType.CUSTOMER_DEPOSIT,
+                accountingType = AccountingType.LIABILITY,
                 balance = Money(
                     currency = Currency.USD,
                     amount = BigDecimal.valueOf(-100)
@@ -62,6 +64,7 @@ class AccountServiceTest {
                 Account(
                     accountId = 10000,
                     accountType = AccountType.CUSTOMER_DEPOSIT,
+                    accountingType = AccountingType.LIABILITY,
                     balance = Money(
                         currency = Currency.USD,
                         amount = BigDecimal.valueOf(-300)

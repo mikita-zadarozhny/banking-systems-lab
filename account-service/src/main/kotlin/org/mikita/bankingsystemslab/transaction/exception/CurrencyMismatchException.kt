@@ -1,6 +1,6 @@
 package org.mikita.bankingsystemslab.transaction.exception
 
-import org.mikita.bankingsystemslab.transaction.domain.Currency
+import org.mikita.bankingsystemslab.transaction.domain.common.Currency
 
 class CurrencyMismatchException : RuntimeException {
 

@@ -1,7 +1,7 @@
 package org.mikita.bankingsystemslab.transaction.service
 
-import org.mikita.bankingsystemslab.transaction.domain.Account
-import org.mikita.bankingsystemslab.transaction.domain.AccountType
+import org.mikita.bankingsystemslab.transaction.domain.account.Account
+import org.mikita.bankingsystemslab.transaction.domain.account.AccountType
 import org.mikita.bankingsystemslab.transaction.exception.AccountDoesNotExistException
 import org.mikita.bankingsystemslab.transaction.exception.OverdraftNotSupportedException
 import org.mikita.bankingsystemslab.transaction.repository.AccountRepository
@@ -17,13 +17,15 @@ class AccountService (
     @Transactional
     fun updateAccountBalance(updateAccountBalanceCommand: UpdateAccountBalanceCommand) {
         val optionalAccount  = accountRepository.findById(updateAccountBalanceCommand.accountId)
+
         if(optionalAccount.isEmpty) {
             throw AccountDoesNotExistException(updateAccountBalanceCommand.accountId)
         }
+
         val account = optionalAccount.get()
         val updatedAccount = account.copy(balance = account.balance + updateAccountBalanceCommand.delta)
 
-        if(account.accountType == AccountType.CUSTOMER_DEPOSIT && updatedAccount.balance > 0) {
+        if(account.accountType == AccountType.CUSTOMER_DEPOSIT && updatedAccount.balance < 0) {
             throw OverdraftNotSupportedException(
                 updateAccountBalanceCommand.accountId,
                 account.balance.amount,

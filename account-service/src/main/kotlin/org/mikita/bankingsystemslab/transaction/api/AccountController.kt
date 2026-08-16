@@ -30,6 +30,8 @@ class AccountController (
 
         return ResponseEntity(AccountResponseDto(
             accountId = account.accountId,
+            accountType = account.accountType,
+            accountingType = account.accountingType,
             balance = account.balance
         ), HttpStatus.CREATED)
     }
@@ -40,6 +42,8 @@ class AccountController (
 
         return ResponseEntity(AccountResponseDto(
             accountId = account.accountId,
+            accountType = account.accountType,
+            accountingType = account.accountingType,
             balance = account.balance
         ), HttpStatus.OK)
     }
