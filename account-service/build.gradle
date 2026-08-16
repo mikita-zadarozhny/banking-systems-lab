@@ -1,0 +1,89 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.flywaydb:flyway-database-postgresql:13.3.0"
+    }
+}
+
+
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.jetbrains.kotlin.jvm' version '2.3.21'
+    id 'org.jetbrains.kotlin.plugin.spring' version '2.3.21'
+    id 'org.springframework.boot' version '4.1.0'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.flywaydb.flyway' version '13.3.0'
+}
+
+application {
+    mainClass = 'org.mikita.bankingsystemslab.user.MainKt'
+}
+
+group = 'org.mikita.bankingsystemslab'
+version = '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    implementation 'org.jetbrains.kotlin:kotlin-reflect'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+
+    runtimeOnly 'org.postgresql:postgresql'
+
+    testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation "io.mockk:mockk-jvm:1.14.11"
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+}
+
+flyway {
+    url = "jdbc:postgresql://localhost:5432/account-service-db"
+    user = System.getenv("DB_USERNAME")
+    password = System.getenv("DB_PASSWORD")
+    schemas = ["public"]
+    locations = ["classpath:db/migration"]
+    cleanDisabled = false
+}
+
+test {
+    useJUnitPlatform()
+}
+
+kotlin {
+    jvmToolchain(25)
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+tasks.register("initDb") {
+    dependsOn("clean", "build", "flywayClean", "flywayMigrate")
+}
+
+tasks.named("build") {
+    mustRunAfter("clean")
+}
+
+tasks.named("flywayClean") {
+    mustRunAfter("build")
+}
+
+tasks.named("flywayMigrate") {
+    mustRunAfter("flywayClean")
+}
