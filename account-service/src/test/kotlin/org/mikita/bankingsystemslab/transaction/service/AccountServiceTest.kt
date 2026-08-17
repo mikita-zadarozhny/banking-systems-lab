@@ -4,17 +4,23 @@ import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.mikita.bankingsystemslab.transaction.domain.account.Account
 import org.mikita.bankingsystemslab.transaction.domain.account.AccountType
 import org.mikita.bankingsystemslab.transaction.domain.account.AccountingType
 import org.mikita.bankingsystemslab.transaction.domain.common.Currency
 import org.mikita.bankingsystemslab.transaction.domain.common.Money
+import org.mikita.bankingsystemslab.transaction.exception.OverdraftNotSupportedException
 import org.mikita.bankingsystemslab.transaction.repository.AccountRepository
 import org.mikita.bankingsystemslab.transaction.service.command.UpdateAccountBalanceCommand
 import java.math.BigDecimal
 import java.util.Optional
+import java.util.stream.Stream
 
 class AccountServiceTest {
 
@@ -29,27 +35,21 @@ class AccountServiceTest {
         accountService = AccountService(accountRepository)
     }
 
-    @Test
-    fun updateAccountBalance() {
+    @ParameterizedTest
+    @MethodSource("updateAccountBalanceHappyCases")
+    fun shouldUpdateAccountBalance_whenAccountBalanceRemainsPositiveAfterUpdate(
+        initialBalance: Money, delta: Money, expectedBalance: Money
+    ) {
 
         // given
-        val updateAccountBalanceCommand = UpdateAccountBalanceCommand(
-            10000,
-            Money(
-                Currency.USD,
-                BigDecimal.valueOf(-200)
-            )
-        )
+        val updateAccountBalanceCommand = UpdateAccountBalanceCommand(10000, delta)
 
         every { accountRepository.findById(10000) } returns Optional.of(
             Account(
                 accountId = 10000,
                 accountType = AccountType.CUSTOMER_DEPOSIT,
                 accountingType = AccountingType.LIABILITY,
-                balance = Money(
-                    currency = Currency.USD,
-                    amount = BigDecimal.valueOf(-100)
-                ),
+                balance = initialBalance,
                 version = 0
             )
         )
@@ -65,14 +65,93 @@ class AccountServiceTest {
                     accountId = 10000,
                     accountType = AccountType.CUSTOMER_DEPOSIT,
                     accountingType = AccountingType.LIABILITY,
-                    balance = Money(
-                        currency = Currency.USD,
-                        amount = BigDecimal.valueOf(-300)
-                    ),
+                    balance = expectedBalance,
                     version = 0
                 )
             )
         }
+    }
 
+    @ParameterizedTest
+    @MethodSource("updateAccountBalanceFailureCases")
+    fun shouldThrowException_whenAccountBalanceBecomesNegativeAfterUpdate(
+        initialBalance: Money, delta: Money
+    ) {
+        // given
+        val updateAccountBalanceCommand = UpdateAccountBalanceCommand(10000, delta)
+
+        every { accountRepository.findById(10000) } returns Optional.of(
+            Account(
+                accountId = 10000,
+                accountType = AccountType.CUSTOMER_DEPOSIT,
+                accountingType = AccountingType.LIABILITY,
+                balance = initialBalance,
+                version = 0
+            )
+        )
+
+        // when
+        val thrownException = assertThrows<OverdraftNotSupportedException> {
+            accountService.updateAccountBalance(updateAccountBalanceCommand)
+        }
+
+        // then
+        val expectedErrorMessage = "Account '10000' liability is '${initialBalance.amount}'. " +
+                "Applying liability delta '${delta.amount}' would result into overdraft."
+        assertEquals(
+            expectedErrorMessage,
+            thrownException.message)
+    }
+
+    companion object {
+        @JvmStatic
+        fun updateAccountBalanceHappyCases(): Stream<Arguments> {
+            return Stream.of(
+                Arguments.of(
+                    Money(Currency.USD, 100),
+                    Money(Currency.USD, 100),
+                    Money(Currency.USD, 200)
+                ),
+                Arguments.of(
+                    Money(Currency.USD, 100),
+                    Money(Currency.USD, -100),
+                    Money(Currency.USD, 0)
+                ),
+                Arguments.of(
+                    Money(Currency.EUR, 200),
+                    Money(Currency.EUR, 300),
+                    Money(Currency.EUR, 500)
+                ),
+                Arguments.of(
+                    Money(Currency.EUR, Long.MAX_VALUE),
+                    Money(Currency.EUR, Long.MAX_VALUE),
+                    Money(Currency.EUR, BigDecimal.valueOf(Long.MAX_VALUE).add(BigDecimal.valueOf(Long.MAX_VALUE)))
+                )
+            )
+        }
+
+        @JvmStatic
+        fun updateAccountBalanceFailureCases(): Stream<Arguments> {
+            return Stream.of(
+                Arguments.of(
+                    Money(Currency.USD, 100),
+                    Money(Currency.USD, -200),
+                ),
+                Arguments.of(
+                    Money(Currency.USD, 100),
+                    Money(Currency.USD, -101),
+                ),
+                Arguments.of(
+                    Money(Currency.EUR, 200),
+                    Money(Currency.EUR, -300),
+                ),
+                Arguments.of(
+                    Money(Currency.EUR, Long.MAX_VALUE),
+                    Money(Currency.EUR, BigDecimal.valueOf(Long.MAX_VALUE)
+                        .add(BigDecimal.valueOf(Long.MAX_VALUE))
+                        .negate())
+                )
+            )
+        }
     }
 }
