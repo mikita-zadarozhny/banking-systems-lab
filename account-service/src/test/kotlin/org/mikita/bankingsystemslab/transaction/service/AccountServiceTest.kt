@@ -1,11 +1,13 @@
 package org.mikita.bankingsystemslab.transaction.service
 
 import io.mockk.MockKAnnotations
+import io.mockk.Ordering
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -17,6 +19,7 @@ import org.mikita.bankingsystemslab.transaction.domain.common.Currency
 import org.mikita.bankingsystemslab.transaction.domain.common.Money
 import org.mikita.bankingsystemslab.transaction.exception.OverdraftNotSupportedException
 import org.mikita.bankingsystemslab.transaction.repository.AccountRepository
+import org.mikita.bankingsystemslab.transaction.service.command.CreateAccountCommand
 import org.mikita.bankingsystemslab.transaction.service.command.UpdateAccountBalanceCommand
 import java.math.BigDecimal
 import java.util.Optional
@@ -33,6 +36,52 @@ class AccountServiceTest {
     fun beforeEach() {
         MockKAnnotations.init(this, relaxUnitFun = true)
         accountService = AccountService(accountRepository)
+    }
+
+    @Test
+    fun shouldGetAccount()  {
+
+        // given
+        val accountId: Long = 1000
+
+        val expectedAccount = Account(
+            accountId = 10000,
+            accountType = AccountType.CUSTOMER_DEPOSIT,
+            accountingType = AccountingType.LIABILITY,
+            balance = Money(Currency.USD, 0),
+            version = 0
+        )
+
+        every { accountRepository.getById(accountId) } returns expectedAccount
+
+        // when
+        val account = accountService.getAccount(accountId)
+
+        // then
+        assertEquals(expectedAccount, account)
+    }
+
+    @Test
+    fun shouldCreateAccount()  {
+
+        // given
+        val createAccountCommand = CreateAccountCommand(Currency.USD)
+
+        val expectedAccount = Account(
+            accountId = 10000,
+            accountType = AccountType.CUSTOMER_DEPOSIT,
+            accountingType = AccountingType.LIABILITY,
+            balance = Money(Currency.USD, 0),
+            version = 0
+        )
+
+        every { accountRepository.saveNew(Currency.USD) } returns expectedAccount
+
+        // when
+        val account = accountService.createAccount(createAccountCommand)
+
+        // then
+        assertEquals(expectedAccount, account)
     }
 
     @ParameterizedTest
@@ -58,7 +107,7 @@ class AccountServiceTest {
         accountService.updateAccountBalance(updateAccountBalanceCommand)
 
         // then
-        verify {
+        verify (ordering = Ordering.SEQUENCE) {
             accountRepository.findById(10000)
             accountRepository.updateBalanceOptimistically(
                 Account(
