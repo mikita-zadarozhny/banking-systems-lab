@@ -105,7 +105,7 @@ class AccountRepository (
         )
 
         if (updatedRows == 0) {
-            throw OptimisticLockingFailureException("Unable to update account. Expected version was ${account.version}")
+            throw OptimisticLockingFailureException("Unable to update account. Expected version was ${account.version}.")
         }
     }
 }
