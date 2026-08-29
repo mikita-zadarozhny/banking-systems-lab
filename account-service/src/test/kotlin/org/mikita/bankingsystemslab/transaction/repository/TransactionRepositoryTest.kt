@@ -2,11 +2,10 @@ package org.mikita.bankingsystemslab.transaction.repository
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.EnumSource
-import org.mikita.bankingsystemslab.transaction.domain.common.Currency
 import org.mikita.bankingsystemslab.transaction.domain.transaction.Transaction
 import org.mikita.bankingsystemslab.transaction.domain.transaction.TransactionType
 import org.mikita.bankingsystemslab.transaction.exception.TransactionIdClashException
@@ -40,6 +39,30 @@ class TransactionRepositoryTest : BaseJdbcTest() {
 
         // then
         assertEquals(expected, actual)
+    }
+
+    @Test
+    @Tag("NotImplemented")
+    @Disabled("Not Implemented")
+    fun shouldFindById_whenTransactionExists() {
+    }
+
+    @Test
+    @Tag("NotImplemented")
+    @Disabled("Not Implemented")
+    fun shouldReturnEmptyOptional_whenFindById_andTransactionDoesNotExist() {
+    }
+
+    @Test
+    @Tag("NotImplemented")
+    @Disabled("Not Implemented")
+    fun shouldGetById_whenTransactionExists() {
+    }
+
+    @Test
+    @Tag("NotImplemented")
+    @Disabled("Not Implemented")
+    fun shouldThrowException_whenGetById_andTransactionDoesNotExist() {
     }
 
     @Test

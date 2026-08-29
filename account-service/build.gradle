@@ -62,7 +62,10 @@ flyway {
 }
 
 test {
-    useJUnitPlatform()
+    useJUnitPlatform {
+        excludeTags 'NotImplemented'
+    }
+    exclude '**/*IntegrationTest.class'
 }
 
 kotlin {
@@ -80,7 +83,9 @@ tasks.register('integrationTest', Test) {
     testClassesDirs = tasks.named('test').get().testClassesDirs
     classpath = tasks.named('test').get().classpath
 
-    useJUnitPlatform()
+    useJUnitPlatform {
+        excludeTags 'NotImplemented'
+    }
 
     filter {
         includeTestsMatching "org.mikita.bankingsystemslab.transaction.api.*"
