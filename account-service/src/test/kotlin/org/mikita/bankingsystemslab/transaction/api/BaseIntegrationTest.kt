@@ -104,8 +104,12 @@ abstract class BaseIntegrationTest {
     }
 
     protected fun deposit(recipient: Long, money: Money): CreateTransactionResponseDto {
+        return deposit(recipient, money, UUID.randomUUID().toString())
+    }
+
+    protected fun deposit(recipient: Long, money: Money, idempotencyKey: String): CreateTransactionResponseDto {
         return createTransactionAndGetSpec(
-            idempotencyKey = UUID.randomUUID().toString(),
+            idempotencyKey = idempotencyKey,
             money = money,
             sender = null,
             recipient = recipient,
@@ -117,8 +121,12 @@ abstract class BaseIntegrationTest {
     }
 
     protected fun transfer(sender: Long, recipient: Long, money: Money): CreateTransactionResponseDto {
+        return transfer(sender, recipient, money, UUID.randomUUID().toString())
+    }
+
+    protected fun transfer(sender: Long, recipient: Long, money: Money, idempotencyKey: String): CreateTransactionResponseDto {
         return createTransactionAndGetSpec(
-            idempotencyKey = UUID.randomUUID().toString(),
+            idempotencyKey = idempotencyKey,
             money = money,
             sender = sender,
             recipient = recipient,
@@ -130,8 +138,12 @@ abstract class BaseIntegrationTest {
     }
 
     protected fun withdraw(sender: Long, money: Money): CreateTransactionResponseDto {
+        return withdraw(sender, money, UUID.randomUUID().toString())
+    }
+
+    protected fun withdraw(sender: Long, money: Money, idempotencyKey: String): CreateTransactionResponseDto {
         return createTransactionAndGetSpec(
-            idempotencyKey = UUID.randomUUID().toString(),
+            idempotencyKey = idempotencyKey,
             money = money,
             sender = sender,
             recipient = null,

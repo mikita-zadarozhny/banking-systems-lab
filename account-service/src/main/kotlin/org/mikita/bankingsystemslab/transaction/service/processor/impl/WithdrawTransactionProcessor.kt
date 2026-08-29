@@ -37,7 +37,7 @@ class WithdrawTransactionProcessor (
             createTransactionCommand.type
         )
 
-        transactionRepository.save(transaction)
+        transactionRepository.saveNew(transaction)
 
         accountService.updateAccountBalance(
             UpdateAccountBalanceCommand(

@@ -36,7 +36,7 @@ class DepositTransactionProcessor (
             createTransactionCommand.type
         )
 
-        transactionRepository.save(transaction)
+        transactionRepository.saveNew(transaction)
 
         accountService.updateAccountBalance(UpdateAccountBalanceCommand(
             accountId = properties.cashAccounts[createTransactionCommand.money.currency]!!, // USD Cash

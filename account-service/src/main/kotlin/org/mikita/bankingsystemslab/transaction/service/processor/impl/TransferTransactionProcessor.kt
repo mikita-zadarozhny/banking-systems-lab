@@ -35,7 +35,7 @@ class TransferTransactionProcessor (
             createTransactionCommand.type
         )
 
-        transactionRepository.save(transaction)
+        transactionRepository.saveNew(transaction)
 
         accountService.updateAccountBalance(UpdateAccountBalanceCommand(
             accountId = createTransactionCommand.sender!!,
