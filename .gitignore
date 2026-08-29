@@ -37,3 +37,6 @@ build
 
 # Ignore Kotlin plugin data
 .kotlin
+
+# Local Env
+./docker/local.env
