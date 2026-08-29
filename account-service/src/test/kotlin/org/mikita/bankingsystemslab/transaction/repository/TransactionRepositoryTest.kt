@@ -1,13 +1,13 @@
 package org.mikita.bankingsystemslab.transaction.repository
 
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
-import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mikita.bankingsystemslab.transaction.domain.transaction.Transaction
 import org.mikita.bankingsystemslab.transaction.domain.transaction.TransactionType
+import org.mikita.bankingsystemslab.transaction.exception.TransactionDoesNotExistException
 import org.mikita.bankingsystemslab.transaction.exception.TransactionIdClashException
 import org.mikita.bankingsystemslab.transaction.exception.TransactionIdempotencyKeyClashException
 import org.testcontainers.junit.jupiter.Testcontainers
@@ -42,27 +42,64 @@ class TransactionRepositoryTest : BaseJdbcTest() {
     }
 
     @Test
-    @Tag("NotImplemented")
-    @Disabled("Not Implemented")
     fun shouldFindById_whenTransactionExists() {
+
+        // given
+        val transaction = Transaction(
+            "transaction-id",
+            "idempotency-key",
+            TransactionType.TRANSFER
+        )
+
+        val expected = transactionRepository.saveNew(transaction)
+
+        // when
+        val actual = transactionRepository.findById(expected.id)
+
+        // then
+        assertTrue(actual.isPresent)
+        assertEquals(expected, actual.get())
     }
 
     @Test
-    @Tag("NotImplemented")
-    @Disabled("Not Implemented")
     fun shouldReturnEmptyOptional_whenFindById_andTransactionDoesNotExist() {
+
+        // when
+        val actual = transactionRepository.findById("non-existing-transaction-id")
+
+        // then
+        assertTrue(actual.isEmpty)
     }
 
     @Test
-    @Tag("NotImplemented")
-    @Disabled("Not Implemented")
     fun shouldGetById_whenTransactionExists() {
+
+        // given
+        val transaction = Transaction(
+            "transaction-id",
+            "idempotency-key",
+            TransactionType.TRANSFER
+        )
+
+        val expected = transactionRepository.saveNew(transaction)
+
+        // when
+        val actual = transactionRepository.getById(expected.id)
+
+        // then
+        assertEquals(expected, actual)
     }
 
     @Test
-    @Tag("NotImplemented")
-    @Disabled("Not Implemented")
     fun shouldThrowException_whenGetById_andTransactionDoesNotExist() {
+
+        // when
+        val exception = assertThrows<TransactionDoesNotExistException> {
+            transactionRepository.getById("non-existing-transaction-id")
+        }
+
+        // then
+        assertEquals("Transaction 'non-existing-transaction-id' does not exist.", exception.message)
     }
 
     @Test

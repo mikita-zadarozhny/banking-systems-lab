@@ -25,7 +25,7 @@ class TransactionRepository (
     val pgKeyPattern: Pattern = Pattern.compile("Key \\(([^)]+)\\)=")
 
     @Transactional(propagation = Propagation.MANDATORY)
-    fun findById(id: Long): Optional<Transaction> {
+    fun findById(id: String): Optional<Transaction> {
 
         val transactionRowMapper = RowMapper { rs, _ ->
             Transaction(
@@ -37,7 +37,7 @@ class TransactionRepository (
 
         val query = "SELECT id, idempotency_key, transaction_type " +
                 "FROM transactions " +
-                "WHERE account_id = ?"
+                "WHERE id = ?"
 
         val queryForObject: Transaction
 
@@ -51,7 +51,7 @@ class TransactionRepository (
     }
 
     @Transactional(propagation = Propagation.MANDATORY)
-    fun getById(id: Long): Transaction {
+    fun getById(id: String): Transaction {
         return findById(id).orElseThrow{ TransactionDoesNotExistException(id) }
     }
 
