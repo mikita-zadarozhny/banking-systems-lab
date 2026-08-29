@@ -15,7 +15,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @Testcontainers
 class TransactionRepositoryTest : BaseJdbcTest() {
 
-    lateinit var transactionRepository: TransactionRepository
+    private lateinit var transactionRepository: TransactionRepository
 
     @BeforeEach
     override fun setUp() {

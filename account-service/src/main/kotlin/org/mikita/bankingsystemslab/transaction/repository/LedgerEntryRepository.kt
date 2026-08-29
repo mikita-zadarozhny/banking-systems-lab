@@ -6,12 +6,15 @@ import org.mikita.bankingsystemslab.transaction.domain.ledger.LedgerEntry
 import org.mikita.bankingsystemslab.transaction.domain.ledger.LedgerEntryType
 import org.springframework.jdbc.core.BatchPreparedStatementSetter
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.sql.PreparedStatement
+import java.sql.ResultSet
 import java.sql.Types
+import java.util.ArrayList
 
 @Repository
 class LedgerEntryRepository (
@@ -40,14 +43,48 @@ class LedgerEntryRepository (
         })
     }
 
-    fun getSumOfLedgerEntries(entry_type: LedgerEntryType, currency: Currency): Money {
+    @Transactional(propagation = Propagation.MANDATORY)
+    fun findAllByTransactionId(transactionId: String): List<LedgerEntry> {
+        val query = "SELECT transaction_id, entry_type, account_id, currency, amount " +
+                "FROM ledger " +
+                "WHERE transaction_id = ?"
+
+        val transactionRowMapper: RowMapper<LedgerEntry> = RowMapper { rs: ResultSet, `_`: Int ->
+            LedgerEntry(
+                transactionId = rs.getString("transaction_id"),
+                entryType = LedgerEntryType.valueOf(rs.getString("entry_type")),
+                accountId = rs.getLong("account_id"),
+                money = Money(
+                    Currency.valueOf(rs.getString("currency")),
+                    rs.getBigDecimal("amount")
+                ),
+            )
+        }
+
+        val ledgerEntries = jdbcTemplate.query(
+            query,
+            arrayOf<Any?>(
+                transactionId
+            ),
+            intArrayOf(
+                Types.VARCHAR
+            ),
+            transactionRowMapper
+        )
+
+        return ArrayList(ledgerEntries)
+    }
+
+    @Transactional(propagation = Propagation.MANDATORY)
+    fun getSumOfLedgerEntries(entryType: LedgerEntryType, currency: Currency): Money {
         val query = "SELECT SUM(amount) " +
                 "FROM ledger " +
                 "WHERE entry_type = ? and currency = ?"
+
         val amount = jdbcTemplate.queryForObject(
             query,
             arrayOf<Any?>(
-                entry_type.name,
+                entryType.name,
                 currency.name
             ),
             intArrayOf(

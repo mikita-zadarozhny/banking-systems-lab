@@ -19,7 +19,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @Testcontainers
 class AccountRepositoryTest : BaseJdbcTest() {
 
-    lateinit var accountRepository: AccountRepository
+    private lateinit var accountRepository: AccountRepository
 
     @BeforeEach
     override fun setUp() {
