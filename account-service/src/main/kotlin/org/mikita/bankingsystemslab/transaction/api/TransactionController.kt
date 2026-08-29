@@ -8,6 +8,7 @@ import org.mikita.bankingsystemslab.transaction.exception.CurrencyMismatchExcept
 import org.mikita.bankingsystemslab.transaction.exception.OverdraftNotSupportedException
 import org.mikita.bankingsystemslab.transaction.service.TransactionService
 import org.mikita.bankingsystemslab.transaction.service.command.CreateTransactionCommand
+import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -41,6 +42,14 @@ class TransactionController (
             message = "Overdraft is not supported."
         )
         return ResponseEntity(error, HttpStatus.BAD_REQUEST)
+    }
+
+    @ExceptionHandler(OptimisticLockingFailureException::class)
+    fun handleOptimisticLockingFailureException(ex: OptimisticLockingFailureException): ResponseEntity<ApiErrorResponseDto> {
+        val error = ApiErrorResponseDto(
+            message = "Concurrency conflicting change occured."
+        )
+        return ResponseEntity(error, HttpStatus.CONFLICT)
     }
 
     @ExceptionHandler(CurrencyMismatchException::class)

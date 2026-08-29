@@ -48,7 +48,7 @@ class WithdrawTransactionProcessor (
 
         accountService.updateAccountBalance(
             UpdateAccountBalanceCommand(
-                accountId = properties.cashAccounts[createTransactionCommand.money.currency]!!, // USD Cash
+                accountId = properties.cashAccounts[createTransactionCommand.money.currency]!!,
                 delta = -createTransactionCommand.money
             )
         )
