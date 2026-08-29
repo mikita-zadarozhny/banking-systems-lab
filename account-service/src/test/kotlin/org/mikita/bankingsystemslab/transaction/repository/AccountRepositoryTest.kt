@@ -14,9 +14,7 @@ import org.mikita.bankingsystemslab.transaction.domain.common.Currency
 import org.mikita.bankingsystemslab.transaction.domain.common.Money
 import org.mikita.bankingsystemslab.transaction.exception.AccountDoesNotExistException
 import org.springframework.dao.OptimisticLockingFailureException
-import org.testcontainers.junit.jupiter.Testcontainers
 
-@Testcontainers
 class AccountRepositoryTest : BaseJdbcTest() {
 
     private lateinit var accountRepository: AccountRepository

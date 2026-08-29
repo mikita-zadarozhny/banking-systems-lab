@@ -1,22 +1,15 @@
 package org.mikita.bankingsystemslab.transaction.repository
 
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.mikita.bankingsystemslab.transaction.domain.common.Currency
 import org.mikita.bankingsystemslab.transaction.domain.common.Money
 import org.mikita.bankingsystemslab.transaction.domain.ledger.LedgerEntry
 import org.mikita.bankingsystemslab.transaction.domain.ledger.LedgerEntryType
 import org.mikita.bankingsystemslab.transaction.domain.transaction.Transaction
 import org.mikita.bankingsystemslab.transaction.domain.transaction.TransactionType
-import org.mikita.bankingsystemslab.transaction.exception.TransactionDoesNotExistException
-import org.mikita.bankingsystemslab.transaction.exception.TransactionIdClashException
-import org.mikita.bankingsystemslab.transaction.exception.TransactionIdempotencyKeyClashException
-import org.testcontainers.junit.jupiter.Testcontainers
 
-@Testcontainers
 class LedgerRepositoryTest : BaseJdbcTest() {
 
     private lateinit var ledgerEntryRepository: LedgerEntryRepository

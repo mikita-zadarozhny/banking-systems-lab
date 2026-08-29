@@ -10,9 +10,7 @@ import org.mikita.bankingsystemslab.transaction.domain.transaction.TransactionTy
 import org.mikita.bankingsystemslab.transaction.exception.TransactionDoesNotExistException
 import org.mikita.bankingsystemslab.transaction.exception.TransactionIdClashException
 import org.mikita.bankingsystemslab.transaction.exception.TransactionIdempotencyKeyClashException
-import org.testcontainers.junit.jupiter.Testcontainers
 
-@Testcontainers
 class TransactionRepositoryTest : BaseJdbcTest() {
 
     private lateinit var transactionRepository: TransactionRepository

@@ -2,6 +2,7 @@ package org.mikita.bankingsystemslab.transaction.api
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.assertNotNull
 import org.mikita.bankingsystemslab.transaction.api.dto.CreateAccountRequestDto
 import org.mikita.bankingsystemslab.transaction.api.dto.AccountResponseDto
 import org.mikita.bankingsystemslab.transaction.api.dto.CreateTransactionRequestDto
@@ -20,6 +21,7 @@ import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.servlet.client.RestTestClient
 import org.springframework.test.web.servlet.client.expectBody
+import org.springframework.transaction.support.TransactionTemplate
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.postgresql.PostgreSQLContainer
@@ -38,6 +40,9 @@ abstract class BaseIntegrationTest {
 
     @Autowired
     lateinit var ledgerEntryRepository: LedgerEntryRepository
+
+    @Autowired
+    lateinit var transactionTemplate: TransactionTemplate
 
     companion object {
         @Container
@@ -157,9 +162,16 @@ abstract class BaseIntegrationTest {
     }
 
     protected fun checkDebitAndCreditEquality(currency: Currency) {
-        val totalDebit = ledgerEntryRepository.getSumOfLedgerEntries(LedgerEntryType.DEBIT, currency)
-        val totalCredit = ledgerEntryRepository.getSumOfLedgerEntries(LedgerEntryType.CREDIT, currency)
+        var totalDebit: Money? = null
+        var totalCredit: Money? = null
 
+        transactionTemplate.execute {
+            totalDebit = ledgerEntryRepository.getSumOfLedgerEntries(LedgerEntryType.DEBIT, currency)
+            totalCredit = ledgerEntryRepository.getSumOfLedgerEntries(LedgerEntryType.CREDIT, currency)
+        }
+
+        assertNotNull(totalDebit)
+        assertNotNull(totalCredit)
         assertEquals(totalDebit, totalCredit)
     }
 }
