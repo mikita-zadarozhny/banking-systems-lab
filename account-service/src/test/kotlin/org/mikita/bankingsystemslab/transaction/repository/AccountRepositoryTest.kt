@@ -56,7 +56,7 @@ class AccountRepositoryTest : BaseJdbcTest() {
         val expected = accountRepository.saveNew(currency)
 
         // when
-        val actual = accountRepository.findById(expected.accountId);
+        val actual = accountRepository.findById(expected.accountId)
 
         // then
         assertTrue(actual.isPresent)
@@ -67,7 +67,7 @@ class AccountRepositoryTest : BaseJdbcTest() {
     fun shouldReturnEmptyOptional_whenFindById_andAccountDoesNotExist() {
 
         // when
-        val actual = accountRepository.findById(-1);
+        val actual = accountRepository.findById(-1)
 
         // then
         assertTrue(actual.isEmpty)
@@ -81,7 +81,7 @@ class AccountRepositoryTest : BaseJdbcTest() {
         val expected = accountRepository.saveNew(currency)
 
         // when
-        val actual = accountRepository.getById(expected.accountId);
+        val actual = accountRepository.getById(expected.accountId)
 
         // then
         assertEquals(expected, actual)
