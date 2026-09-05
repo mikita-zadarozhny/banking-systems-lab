@@ -1,0 +1,7 @@
+CREATE TABLE users (
+    user_id BIGINT PRIMARY KEY,
+    username VARCHAR(64) UNIQUE,
+    status VARCHAR(32) NOT NULL
+);
+
+CREATE SEQUENCE user_id_seq START 1000000000;
