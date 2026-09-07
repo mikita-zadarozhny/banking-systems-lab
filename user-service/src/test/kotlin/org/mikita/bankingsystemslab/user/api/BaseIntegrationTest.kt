@@ -48,4 +48,10 @@ abstract class BaseIntegrationTest {
             .body(CreateUserRequestDto(username))
             .exchange()
     }
+
+    protected fun getUser(id: Long): RestTestClient.ResponseSpec {
+        return restTestClient.get()
+            .uri("/api/v1/users/{userId}", id)
+            .exchange()
+    }
 }

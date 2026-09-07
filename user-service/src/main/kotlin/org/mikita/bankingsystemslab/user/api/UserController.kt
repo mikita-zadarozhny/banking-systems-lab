@@ -1,11 +1,14 @@
 package org.mikita.bankingsystemslab.user.api
 
+import org.mikita.bankingsystemslab.user.api.dto.ApiErrorResponseDto
 import org.mikita.bankingsystemslab.user.api.dto.CreateUserRequestDto
 import org.mikita.bankingsystemslab.user.api.dto.UserResponseDto
+import org.mikita.bankingsystemslab.user.exception.UsernameClashException
 import org.mikita.bankingsystemslab.user.service.UserService
 import org.mikita.bankingsystemslab.user.service.command.CreateUserCommand
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -50,4 +53,11 @@ class UserController (
         )
     }
 
+    @ExceptionHandler(UsernameClashException::class)
+    fun handleAccountDoesNotExistException(ex: UsernameClashException): ResponseEntity<ApiErrorResponseDto> {
+        val error = ApiErrorResponseDto(
+            message = "Username is already taken."
+        )
+        return ResponseEntity(error, HttpStatus.CONFLICT)
+    }
 }
