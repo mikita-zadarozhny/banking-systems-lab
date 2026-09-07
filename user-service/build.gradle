@@ -88,7 +88,7 @@ tasks.register('integrationTest', Test) {
     }
 
     filter {
-        includeTestsMatching "org.mikita.bankingsystemslab.transaction.api.*"
+        includeTestsMatching "org.mikita.bankingsystemslab.user.api.*"
     }
 }
 
