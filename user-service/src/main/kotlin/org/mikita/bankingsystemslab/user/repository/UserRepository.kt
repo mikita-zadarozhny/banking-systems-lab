@@ -2,6 +2,8 @@ package org.mikita.bankingsystemslab.user.repository
 
 import org.mikita.bankingsystemslab.user.domain.User
 import org.mikita.bankingsystemslab.user.domain.UserStatus
+import org.mikita.bankingsystemslab.user.exception.UsernameClashException
+import org.springframework.dao.DuplicateKeyException
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
@@ -9,11 +11,15 @@ import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 import java.sql.ResultSet
 import java.util.Optional
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 @Repository
 class UserRepository (
     private val jdbcTemplate: JdbcTemplate
 ) {
+
+    val pgKeyPattern: Pattern = Pattern.compile("Key \\(([^)]+)\\)=")
 
     @Transactional
     fun findById(id: Long) : Optional<User> {
@@ -50,13 +56,25 @@ class UserRepository (
             )
         }
 
-        val savedUser = jdbcTemplate.queryForObject(
-            insertQuery,
-            userRowMapper,
-            user.username,
-            user.status.name
-        )
+        try {
+            return jdbcTemplate.queryForObject(
+                insertQuery,
+                userRowMapper,
+                user.username,
+                user.status.name
+            )
+        } catch (ex: DuplicateKeyException) {
+            val rootMessage: String = if (ex.rootCause != null) ex.rootCause!!.message!! else ex.message!!
+            val matcher: Matcher = pgKeyPattern.matcher(rootMessage)
 
-        return savedUser
+            if (matcher.find()) {
+                val duplicatedField = matcher.group(1)
+
+                if ("username" == duplicatedField) {
+                    throw UsernameClashException(user.username)
+                }
+            }
+            throw ex
+        }
     }
 }

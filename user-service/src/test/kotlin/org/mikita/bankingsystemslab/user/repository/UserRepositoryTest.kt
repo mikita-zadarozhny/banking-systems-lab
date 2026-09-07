@@ -1,8 +1,8 @@
 package org.mikita.bankingsystemslab.user.repository
 
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mikita.bankingsystemslab.user.domain.User
@@ -21,7 +21,7 @@ class UserRepositoryTest : BaseJdbcTest() {
     }
 
     @Test
-    fun saveNew_whenNoConflictingUserDoesNotExist() {
+    fun shouldSaveNew_whenNoConflictingUserDoesNotExist() {
 
         // given
         val user = User(
@@ -44,7 +44,6 @@ class UserRepositoryTest : BaseJdbcTest() {
     }
 
     @Test
-    @Tag("Not Implemented")
     fun shouldThrowException_whenSaveNew_andConflictingUsernameExists() {
 
         // given
@@ -69,5 +68,46 @@ class UserRepositoryTest : BaseJdbcTest() {
 
         // then
         assertEquals("Username 'username_1' already exists", exception.message)
+    }
+
+    @Test
+    fun shouldFindById_whenUserExists() {
+
+        // given
+        val user = User(
+            userId = null,
+            username = "username_1",
+            status = UserStatus.ENABLED
+        )
+
+        userRepository.saveNew(user)
+
+        val expectedUserId: Long = getCurrentUserIdSequenceValue()
+
+        val expected = User(
+            userId = expectedUserId,
+            username = "username_1",
+            status = UserStatus.ENABLED
+        )
+
+        // when
+        val actual = userRepository.findById(expectedUserId)
+
+        // then
+        assertTrue(actual.isPresent)
+        assertEquals(expected, actual.get())
+    }
+
+    @Test
+    fun shouldReturnEmptyOptional_whenFindById_andUserDoesNotExist() {
+
+        // given
+        val userId = 123L
+
+        // when
+        val actual = userRepository.findById(userId)
+
+        // then
+        assertTrue(actual.isEmpty)
     }
 }
