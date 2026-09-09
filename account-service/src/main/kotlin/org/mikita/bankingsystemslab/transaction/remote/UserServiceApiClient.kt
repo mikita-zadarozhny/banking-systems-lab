@@ -1,4 +1,4 @@
-package org.mikita.bankingsystemslab.transaction.integration
+package org.mikita.bankingsystemslab.transaction.remote
 
 import org.mikita.bankingsystemslab.transaction.domain.user.User
 import org.springframework.stereotype.Component

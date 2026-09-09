@@ -1,4 +1,4 @@
-package org.mikita.bankingsystemslab.transaction.integration
+package org.mikita.bankingsystemslab.transaction.remote
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
