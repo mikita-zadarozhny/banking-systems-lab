@@ -46,7 +46,7 @@ class AccountControllerIntegrationTest : BaseIntegrationTest() {
     }
 
     @Test
-    fun shouldThrowException_whenGetAccount_andAccountDoesNotExist() {
+    fun shouldReturn404HttpStatusCode_whenGetAccount_andAccountDoesNotExist() {
 
         // when & then
         getAccountResponseSpec(-1)
